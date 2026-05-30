@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agni Agarbatti — Sacred Fragrances</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0f0520; --bg2: #060010;
+    --purple: #3b0764; --purple2: #4c1d95;
+    --gold: #f59e0b; --orange: #f97316; --yellow: #eab308;
+    --text: #fef9f0; --muted: #c4b5fd; --dim: #a78bfa;
+    --card-bg: rgba(59,7,100,0.35); --card-border: rgba(234,179,8,0.15);
+    --cinzel: 'Cinzel', Georgia, serif;
+    --body: 'Cormorant Garamond', Georgia, serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); font-family: var(--body); color: var(--text); min-height: 100vh; }
+  input, textarea, select, button { font-family: inherit; }
+  input:focus, textarea:focus { outline: none; border-color: rgba(245,158,11,0.5) !important; }
+  input::placeholder, textarea::placeholder { color: #6b21a8; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+
+  /* NAV */
+  .nav {
+    background: rgba(15,5,32,0.96); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--card-border);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; height: 60px;
+  }
+  .nav-logo {
+    font-family: var(--cinzel); font-size: 1.2rem; font-weight: 700;
+    color: var(--gold); letter-spacing: .04em; cursor: pointer; user-select: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: .15rem; }
+  .nav-btn {
+    display: flex; align-items: center; gap: .35rem;
+    padding: .45rem .7rem; border-radius: .5rem; cursor: pointer;
+    background: transparent; color: var(--muted); border: none;
+    font-size: .83rem; transition: background .2s, color .2s; position: relative;
+  }
+  .nav-btn:hover { background: rgba(245,158,11,.08); color: var(--gold); }
+  .nav-btn.active { background: rgba(245,158,11,.12); color: var(--gold); }
+  .nav-btn svg { width: 15px; height: 15px; }
+  .cart-badge {
+    position: absolute; top: 2px; right: 2px;
+    background: var(--orange); color: #fff; border-radius: 50%;
+    width: 16px; height: 16px; font-size: .62rem;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  @media(max-width:600px){ .nav-label { display: none !important; } }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: 1rem; padding: 1.5rem; backdrop-filter: blur(8px);
+  }
+  /* HERO */
+  .hero {
+    background: radial-gradient(ellipse 130% 80% at 50% -5%, #4c1d95 0%, #1a0533 45%, #0f0520 100%);
+    min-height: 88vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 5rem 1.5rem 3rem; position: relative; overflow: hidden;
+  }
+  .hero-orb1 {
+    position: absolute; width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle,rgba(245,158,11,.06) 0%,transparent 70%);
+    top: 5%; left: 15%; pointer-events: none;
+  }
+  .hero-orb2 {
+    position: absolute; width: 350px; height: 350px; border-radius: 50%;
+    background: radial-gradient(circle,rgba(168,85,247,.07) 0%,transparent 70%);
+    bottom: 10%; right: 10%; pointer-events: none;
+  }
+  .hero-flame { font-size: 3.8rem; margin-bottom: 1.25rem; filter: drop-shadow(0 0 24px rgba(245,158,11,.5)); }
+  .hero-title { font-family: var(--cinzel); font-size: clamp(2.5rem,7vw,5rem); font-weight: 700; color: var(--text); line-height: 1.08; margin-bottom: .6rem; text-shadow: 0 0 50px rgba(245,158,11,.25); }
+  .hero-sub { font-family: var(--cinzel); color: var(--gold); font-size: .75rem; letter-spacing: .22em; margin-bottom: 1.25rem; }
+  .hero-desc { font-size: clamp(1rem,2.5vw,1.2rem); color: var(--muted); max-width: 560px; line-height: 1.75; margin-bottom: 2.5rem; font-style: italic; }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: linear-gradient(135deg,var(--orange),var(--yellow));
+    color: var(--bg); border: none; border-radius: .5rem;
+    font-family: var(--cinzel); font-weight: 700; cursor: pointer; letter-spacing: .04em;
+    transition: opacity .2s, transform .15s;
+  }
+  .btn-primary:hover { opacity: .92; transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent; color: var(--gold); border: 1px solid var(--gold);
+    border-radius: .5rem; cursor: pointer; font-family: inherit;
+    transition: background .2s;
+  }
+  .btn-outline:hover { background: rgba(245,158,11,.08); }
+  .hero-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem; margin-top: 4rem; max-width: 580px; width: 100%; }
+  .stat-num { font-family: var(--cinzel); font-size: 1.75rem; font-weight: 700; color: var(--gold); }
+  .stat-lbl { font-size: .78rem; color: var(--dim); }
+
+  /* SECTION COMMON */
+  .section-tag { font-family: var(--cinzel); color: var(--gold); font-size: .75rem; letter-spacing: .22em; margin-bottom: .4rem; }
+  .section-h2 { font-family: var(--cinzel); font-size: clamp(1.6rem,4vw,2.4rem); color: var(--text); margin-bottom: .5rem; }
+  .gold { color: var(--gold); }
+  .muted { color: var(--muted); }
+
+  /* PRODUCTS */
+  .products-wrap { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+  .search-wrap { position: relative; max-width: 400px; margin-bottom: 1rem; }
+  .search-wrap svg { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--dim); width: 15px; height: 15px; }
+  .input-base {
+    width: 100%; padding: .65rem; padding-left: 2.2rem;
+    background: rgba(59,7,100,.4); border: 1px solid rgba(234,179,8,.2);
+    border-radius: .5rem; color: var(--text); font-size: .9rem;
+  }
+  .filter-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+  .filter-btn {
+    padding: .38rem 1rem; border-radius: 2rem; cursor: pointer; font-size: .82rem;
+    border: 1px solid rgba(234,179,8,.2); background: transparent; color: var(--muted);
+    transition: all .2s;
+  }
+  .filter-btn.active { border-color: var(--gold); background: rgba(245,158,11,.15); color: var(--gold); }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(230px,1fr)); gap: 1.25rem; }
+
+  /* PRODUCT CARD */
+  .product-card {
+    background: rgba(26,5,51,.7); border: 1px solid rgba(234,179,8,.15);
+    border-radius: 1rem; padding: 1.25rem;
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+  }
+  .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 36px rgba(245,158,11,.16); border-color: rgba(234,179,8,.45); }
+  .product-icon { font-size: 2.5rem; text-align: center; margin-bottom: .75rem; }
+  .product-name { font-family: var(--cinzel); font-size: .93rem; color: var(--text); margin-bottom: .2rem; }
+  .product-meta { font-size: .75rem; color: #a78bfa; margin-bottom: .5rem; }
+  .product-desc { font-size: .82rem; color: var(--muted); margin-bottom: .75rem; line-height: 1.55; }
+  .product-rating { display: flex; align-items: center; gap: .4rem; margin-bottom: .8rem; }
+  .product-footer { display: flex; justify-content: space-between; align-items: center; }
+  .product-price { font-family: var(--cinzel); font-size: 1.1rem; color: var(--gold); font-weight: 700; }
+  .add-btn { background: linear-gradient(135deg,var(--orange),var(--yellow)); color: var(--bg); border: none; border-radius: .5rem; font-family: var(--cinzel); font-weight: 700; cursor: pointer; padding: .42rem 1rem; font-size: .82rem; transition: background .3s; }
+  .add-btn.added { background: linear-gradient(135deg,#15803d,#16a34a); }
+
+  /* STARS */
+  .stars span { font-size: .9rem; }
+
+  /* WHY US */
+  .why-section { background: rgba(59,7,100,.15); padding: 4rem 1.5rem; }
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 1.25rem; max-width: 1100px; margin: 0 auto; }
+
+  /* CART/ORDER */
+  .order-wrap { padding: 3rem 1.5rem; max-width: 1000px; margin: 0 auto; }
+  .order-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap: 1.5rem; }
+  .input-field { width: 100%; padding: .65rem; background: rgba(59,7,100,.4); border: 1px solid rgba(234,179,8,.2); border-radius: .5rem; color: var(--text); font-size: .9rem; box-sizing: border-box; }
+  .input-label { display: block; color: var(--muted); font-size: .8rem; margin-bottom: .35rem; }
+  .pay-btn {
+    padding: .4rem .85rem; border-radius: .35rem; cursor: pointer; font-size: .8rem;
+    border: 1px solid rgba(234,179,8,.2); background: transparent; color: var(--muted); transition: all .2s;
+  }
+  .pay-btn.active { border-color: var(--gold); background: rgba(245,158,11,.15); color: var(--gold); }
+  .cart-item { display: flex; align-items: center; gap: .75rem; padding: .75rem 0; border-bottom: 1px solid rgba(234,179,8,.08); }
+  .qty-ctrl { display: flex; align-items: center; gap: .5rem; background: rgba(59,7,100,.5); border-radius: .4rem; padding: .2rem .5rem; }
+  .qty-btn { background: none; border: none; color: var(--gold); cursor: pointer; font-size: 1.1rem; line-height: 1; }
+
+  /* DASHBOARD */
+  .dash-wrap { padding: 3rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(210px,1fr)); gap: 1rem; margin-bottom: 1.75rem; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 1.5rem; margin-bottom: 1.75rem; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: .87rem; min-width: 500px; }
+  th { text-align: left; padding: .5rem .75rem; color: var(--dim); font-weight: 500; font-size: .75rem; letter-spacing: .07em; }
+  td { padding: .7rem .75rem; border-top: 1px solid rgba(234,179,8,.07); }
+  .status-badge { padding: .2rem .6rem; border-radius: .3rem; font-size: .75rem; font-weight: 600; }
+  .chart-svg-container { width: 100%; overflow: hidden; }
+
+  /* CONTACT */
+  .contact-wrap { padding: 3rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+  .contact-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 3rem; }
+
+  /* FOOTER */
+  footer { background: var(--bg2); border-top: 1px solid rgba(234,179,8,.1); padding: 2rem 1.5rem; text-align: center; margin-top: 2rem; }
+
+  /* CANVAS CHARTS */
+  canvas { display: block; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 6rem 1.5rem; }
+  .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+  .success-icon { font-size: 4rem; margin-bottom: 1rem; }
+
+  /* INLINE INPUT NO PADDING-LEFT */
+  .input-npl { padding-left: .65rem !important; }
+
+  .bestseller-section { padding: 4rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="showPage('home')">🪔 Agni Agarbatti</div>
+    <div class="nav-links">
+      <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-btn" id="nav-products" onclick="showPage('products')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        <span class="nav-label">Products</span>
+      </button>
+      <button class="nav-btn" id="nav-dashboard" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-btn" id="nav-contact" onclick="showPage('contact')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.72 19.79 19.79 0 01.22 1.12 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        <span class="nav-label">Contact</span>
+      </button>
+      <button class="nav-btn" id="nav-cart" onclick="showPage('cart')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+        <span class="nav-label">Cart</span>
+        <span class="cart-badge" id="cart-badge" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HOME ═══ -->
+<div class="page active" id="page-home">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-orb1"></div>
+    <div class="hero-orb2"></div>
+    <div class="hero-flame">🪔</div>
+    <h1 class="hero-title">Agni <span class="gold">Agarbatti</span></h1>
+    <div class="hero-sub">EST. 1998 · JAIPUR, RAJASTHAN</div>
+    <p class="hero-desc">Sacred fragrances that carry your prayers to the divine. Pure, natural, handcrafted incense.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" style="padding:.9rem 2.2rem;font-size:1rem;" onclick="showPage('products')">Shop Now →</button>
+      <button class="btn-outline" style="padding:.9rem 2.2rem;font-size:1rem;" onclick="showPage('contact')">Contact Us</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">26+</div><div class="stat-lbl">Years</div></div>
+      <div><div class="stat-num">50+</div><div class="stat-lbl">Varieties</div></div>
+      <div><div class="stat-num">10K+</div><div class="stat-lbl">Customers</div></div>
+      <div><div class="stat-num">15+</div><div class="stat-lbl">Cities</div></div>
+    </div>
+  </div>
+
+  <!-- Bestsellers -->
+  <div class="bestseller-section">
+    <div style="text-align:center;margin-bottom:2.5rem;">
+      <div class="section-tag">BESTSELLERS</div>
+      <h2 class="section-h2">Our Sacred <span class="gold">Collection</span></h2>
+    </div>
+    <div class="products-grid" id="home-products"></div>
+    <div style="text-align:center;margin-top:2rem;">
+      <button class="btn-primary" style="padding:.8rem 2rem;font-size:.95rem;" onclick="showPage('products')">View All Products</button>
+    </div>
+  </div>
+
+  <!-- Why Us -->
+  <div class="why-section">
+    <h2 class="section-h2" style="text-align:center;margin-bottom:2.5rem;max-width:1100px;margin-left:auto;margin-right:auto;">Why Choose <span class="gold">Agni Agarbatti?</span></h2>
+    <div class="why-grid">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2.2rem;margin-bottom:.75rem;">🌿</div>
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:.4rem;font-size:.92rem;">100% Natural</div>
+        <div style="color:var(--muted);font-size:.83rem;line-height:1.65;">No chemicals — pure botanical extracts and traditional masalas</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2.2rem;margin-bottom:.75rem;">🔥</div>
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:.4rem;font-size:.92rem;">Long-Lasting</div>
+        <div style="color:var(--muted);font-size:.83rem;line-height:1.65;">Each stick burns 45–60 mins of rich, consistent fragrance</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2.2rem;margin-bottom:.75rem;">🚚</div>
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:.4rem;font-size:.92rem;">Fast Delivery</div>
+        <div style="color:var(--muted);font-size:.83rem;line-height:1.65;">Pan-India delivery in 2–3 working days from Jaipur</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:2.2rem;margin-bottom:.75rem;">💯</div>
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:.4rem;font-size:.92rem;">Purity Assured</div>
+        <div style="color:var(--muted);font-size:.83rem;line-height:1.65;">Handcrafted in small batches for premium quality control</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PRODUCTS ═══ -->
+<div class="page" id="page-products">
+  <div class="products-wrap">
+    <div class="section-tag">CATALOGUE</div>
+    <h2 class="section-h2">Our <span class="gold">Products</span></h2>
+    <p class="muted" style="margin-bottom:2rem;">Sacred fragrances for every occasion</p>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="input-base" id="prod-search" placeholder="Search products…" oninput="renderProducts()" />
+    </div>
+    <div class="filter-row" id="filter-row"></div>
+    <div class="products-grid" id="all-products"></div>
+  </div>
+</div>
+
+<!-- ═══ CART ═══ -->
+<div class="page" id="page-cart">
+  <div class="order-wrap" id="cart-content"></div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page" id="page-dashboard">
+  <div class="dash-wrap">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem;">
+      <div>
+        <div class="section-tag">ANALYTICS</div>
+        <h2 class="section-h2" style="margin-bottom:0;">Business <span class="gold">Dashboard</span></h2>
+      </div>
+      <select id="year-sel" style="background:rgba(59,7,100,.5);border:1px solid rgba(234,179,8,.25);border-radius:.5rem;color:var(--gold);padding:.5rem 1rem;cursor:pointer;font-size:.9rem;">
+        <option>2024</option><option>2023</option><option>2022</option>
+      </select>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpi-cards"></div>
+
+    <!-- Charts Row -->
+    <div class="chart-grid">
+      <div class="card">
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:1rem;font-size:.92rem;">Monthly Earnings vs Expenses</div>
+        <canvas id="area-chart" height="200"></canvas>
+        <div style="display:flex;gap:1.5rem;margin-top:.75rem;">
+          <div style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;"><div style="width:10px;height:3px;background:#f59e0b;border-radius:2px;"></div><span class="muted">Revenue</span></div>
+          <div style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;"><div style="width:10px;height:3px;background:#f97316;border-radius:2px;"></div><span class="muted">Expenses</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:1rem;font-size:.92rem;">Expense Breakdown</div>
+        <canvas id="pie-chart" height="160"></canvas>
+        <div id="pie-legend" style="display:flex;flex-direction:column;gap:.35rem;margin-top:.5rem;"></div>
+      </div>
+    </div>
+
+    <!-- Profit Bar -->
+    <div class="card" style="margin-bottom:1.75rem;">
+      <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:1rem;font-size:.92rem;">Monthly Net Profit</div>
+      <canvas id="bar-chart" height="180"></canvas>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card">
+      <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:1rem;font-size:.92rem;">Recent Orders</div>
+      <div style="overflow-x:auto;"><table id="orders-table"></table></div>
+      <div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid rgba(234,179,8,.08);display:flex;gap:1.5rem;flex-wrap:wrap;" id="dash-totals"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONTACT ═══ -->
+<div class="page" id="page-contact">
+  <div class="contact-wrap">
+    <div class="contact-grid">
+      <!-- Reviews -->
+      <div>
+        <div class="section-tag">TESTIMONIALS</div>
+        <h2 class="section-h2" style="margin-bottom:1.5rem;">Customer <span class="gold">Reviews</span></h2>
+        <div style="display:flex;flex-direction:column;gap:1rem;" id="reviews-list"></div>
+      </div>
+      <!-- Form -->
+      <div>
+        <div class="section-tag">GET IN TOUCH</div>
+        <h2 class="section-h2" style="margin-bottom:1.5rem;">Contact <span class="gold">Us</span></h2>
+        <div class="card" style="margin-bottom:1.25rem;" id="contact-form-wrap">
+          <div style="margin-bottom:.85rem;">
+            <label class="input-label">Your Name</label>
+            <input class="input-field input-npl" type="text" placeholder="Your Name" />
+          </div>
+          <div style="margin-bottom:.85rem;">
+            <label class="input-label">Phone / WhatsApp</label>
+            <input class="input-field input-npl" type="tel" placeholder="Phone / WhatsApp" />
+          </div>
+          <div style="margin-bottom:.85rem;">
+            <label class="input-label">Email</label>
+            <input class="input-field input-npl" type="email" placeholder="Email" />
+          </div>
+          <div style="margin-bottom:1.25rem;">
+            <label class="input-label">Message</label>
+            <textarea class="input-field input-npl" rows="4" placeholder="Your message…" style="resize:vertical;"></textarea>
+          </div>
+          <button class="btn-primary" style="width:100%;padding:.85rem;font-size:.92rem;" onclick="sendContact()">Send Message</button>
+        </div>
+        <div class="card">
+          <div style="display:flex;gap:.75rem;margin-bottom:.9rem;">
+            <span style="font-size:1.1rem;margin-top:.1rem;">📍</span>
+            <div><div style="font-family:var(--cinzel);color:var(--gold);font-size:.78rem;">Shop Address</div><div class="muted" style="font-size:.83rem;margin-top:.15rem;">123, Gandhi Nagar Market, Jaipur — 302015</div></div>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-bottom:.9rem;">
+            <span style="font-size:1.1rem;margin-top:.1rem;">📞</span>
+            <div><div style="font-family:var(--cinzel);color:var(--gold);font-size:.78rem;">Phone/WhatsApp</div><div class="muted" style="font-size:.83rem;margin-top:.15rem;">+91 98765 43210</div></div>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-bottom:.9rem;">
+            <span style="font-size:1.1rem;margin-top:.1rem;">🕐</span>
+            <div><div style="font-family:var(--cinzel);color:var(--gold);font-size:.78rem;">Business Hours</div><div class="muted" style="font-size:.83rem;margin-top:.15rem;">Mon–Sat: 9 AM – 8 PM</div></div>
+          </div>
+          <div style="display:flex;gap:.75rem;">
+            <span style="font-size:1.1rem;margin-top:.1rem;">📦</span>
+            <div><div style="font-family:var(--cinzel);color:var(--gold);font-size:.78rem;">Bulk Orders</div><div class="muted" style="font-size:.83rem;margin-top:.15rem;">WhatsApp us for wholesale pricing</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:.4rem;font-size:1rem;">🪔 Agni Agarbatti</div>
+  <div style="color:#4a1d96;font-size:.78rem;">© 2024 Agni Agarbatti · Spreading divine fragrance since 1998 · Jaipur, Rajasthan</div>
+</footer>
+
+<script>
+/* ═══════════ DATA ═══════════ */
+const PRODUCTS = [
+  { id:1, name:"Rose Garden",      cat:"Floral",  price:45,  qty:"100 sticks", rating:4.8, rev:124, icon:"🌹", desc:"Delicate rose fragrance for daily puja" },
+  { id:2, name:"Sandalwood Royal", cat:"Woody",   price:80,  qty:"50 sticks",  rating:4.9, rev:89,  icon:"🪵", desc:"Pure sandalwood essence, 60-min burn" },
+  { id:3, name:"Jasmine Divine",   cat:"Floral",  price:40,  qty:"100 sticks", rating:4.7, rev:156, icon:"🌸", desc:"Fresh jasmine aroma for meditation" },
+  { id:4, name:"Mogra Special",    cat:"Floral",  price:50,  qty:"75 sticks",  rating:4.6, rev:98,  icon:"🌺", desc:"Rich mogra fragrance, temple grade" },
+  { id:5, name:"Chandan Premium",  cat:"Premium", price:120, qty:"25 sticks",  rating:5.0, rev:67,  icon:"✨", desc:"Luxury chandan blend, gift-worthy" },
+  { id:6, name:"Dhoop Cone Pack",  cat:"Puja",    price:60,  qty:"20 cones",   rating:4.8, rev:112, icon:"🔥", desc:"Dense smoke cones for rituals" },
+  { id:7, name:"Lavender Peace",   cat:"Woody",   price:55,  qty:"80 sticks",  rating:4.5, rev:78,  icon:"💜", desc:"Calming lavender for stress relief" },
+  { id:8, name:"Gulab Puja Pack",  cat:"Puja",    price:35,  qty:"150 sticks", rating:4.4, rev:203, icon:"🙏", desc:"Economy pack for daily worship" },
+];
+
+const MONTHLY = [
+  {m:"Jan",earn:45000,exp:28000},{m:"Feb",earn:52000,exp:31000},
+  {m:"Mar",earn:48000,exp:27000},{m:"Apr",earn:61000,exp:35000},
+  {m:"May",earn:55000,exp:32000},{m:"Jun",earn:67000,exp:38000},
+  {m:"Jul",earn:59000,exp:34000},{m:"Aug",earn:72000,exp:40000},
+  {m:"Sep",earn:68000,exp:37000},{m:"Oct",earn:85000,exp:45000},
+  {m:"Nov",earn:91000,exp:48000},{m:"Dec",earn:110000,exp:55000},
+];
+const EXP_CATS = [
+  {name:"Raw Materials",value:45,color:"#f97316"},
+  {name:"Packaging",    value:20,color:"#eab308"},
+  {name:"Transport",    value:15,color:"#a855f7"},
+  {name:"Staff",        value:12,color:"#c084fc"},
+  {name:"Misc",         value:8, color:"#6b21a8"},
+];
+const ORDERS_DATA = [
+  {id:"AG001",customer:"Amit Shah",   items:3,amount:175,status:"Delivered", date:"Dec 15"},
+  {id:"AG002",customer:"Meena Gupta", items:1,amount:80, status:"Processing",date:"Dec 16"},
+  {id:"AG003",customer:"Vikram Patel",items:5,amount:295,status:"Shipped",   date:"Dec 17"},
+  {id:"AG004",customer:"Anita Singh", items:2,amount:120,status:"Delivered", date:"Dec 18"},
+  {id:"AG005",customer:"Suresh Rao",  items:4,amount:220,status:"Pending",   date:"Dec 19"},
+];
+const REVIEWS = [
+  {name:"Priya Sharma",loc:"Delhi", rating:5,text:"Best agarbatti I've ever used! Sandalwood fragrance fills the entire room beautifully."},
+  {name:"Rajesh Kumar",loc:"Mumbai",rating:5,text:"Pure and authentic. My whole family loves the Mogra sticks for daily puja."},
+  {name:"Sunita Devi", loc:"Jaipur",rating:4,text:"Great quality for the price. Fast delivery and beautifully packed."},
+  {name:"Arun Verma",  loc:"Pune",  rating:5,text:"The Chandan Premium is absolutely divine. Worth every rupee!"},
+];
+const CATS = ["All","Floral","Woody","Premium","Puja"];
+const STATUS_COLORS = {
+  Delivered: {bg:"#14532d33",text:"#4ade80"},
+  Processing:{bg:"#78350f33",text:"#fbbf24"},
+  Shipped:   {bg:"#1e3a8a33",text:"#60a5fa"},
+  Pending:   {bg:"#3b076433",text:"#c084fc"},
+};
+
+/* ═══════════ STATE ═══════════ */
+let cart = [];
+let activeCat = "All";
+let currentPage = "home";
+let chartInstances = {};
+
+/* ═══════════ HELPERS ═══════════ */
+const inr = n => `₹${Number(n).toLocaleString("en-IN")}`;
+const totalEarn = MONTHLY.reduce((s,m)=>s+m.earn,0);
+const totalExp  = MONTHLY.reduce((s,m)=>s+m.exp,0);
+const cartCount = () => cart.reduce((s,i)=>s+i.qty,0);
+const cartTotal = () => cart.reduce((s,i)=>s+i.price*i.qty,0);
+
+function stars(rating){
+  return "★★★★★".split("").map((_,i)=>`<span style="color:${i<Math.round(rating)?'#f59e0b':'#4a1d96'};font-size:.9rem;">★</span>`).join("");
+}
+
+/* ═══════════ NAV ═══════════ */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+(id==='cart'?'cart':id)).classList.add('active');
+  const nb = document.getElementById('nav-'+(id==='cart'?'cart':id));
+  if(nb) nb.classList.add('active');
+  currentPage = id;
+  if(id==='products') renderProducts();
+  if(id==='cart') renderCart();
+  if(id==='dashboard') { setTimeout(renderDashboard,50); }
+  if(id==='contact') renderContact();
+  window.scrollTo(0,0);
+}
+
+/* ═══════════ PRODUCT CARD ═══════════ */
+function productCardHTML(p, showAll){
+  return `
+  <div class="product-card">
+    <div class="product-icon">${p.icon}</div>
+    <div class="product-name">${p.name}</div>
+    <div class="product-meta">${p.cat} · ${p.qty}</div>
+    <div class="product-desc">${p.desc}</div>
+    <div class="product-rating">${stars(p.rating)}<span style="color:#a78bfa;font-size:.75rem;">(${p.rev})</span></div>
+    <div class="product-footer">
+      <span class="product-price">₹${p.price}</span>
+      <button class="add-btn" id="addbtn-${p.id}" onclick="addToCart(${p.id})">+ Add</button>
+    </div>
+  </div>`;
+}
+
+function addToCart(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  const ex = cart.find(x=>x.id===id);
+  if(ex) ex.qty++;
+  else cart.push({...p, qty:1});
+  updateCartBadge();
+  const btn = document.getElementById('addbtn-'+id);
+  if(btn){ btn.textContent="✓ Added"; btn.style.background="linear-gradient(135deg,#15803d,#16a34a)"; setTimeout(()=>{btn.textContent="+ Add";btn.style.background="";},1300); }
+}
+
+function updateCartBadge(){
+  const badge = document.getElementById('cart-badge');
+  const n = cartCount();
+  badge.style.display = n>0?'flex':'none';
+  badge.textContent = n;
+}
+
+/* ═══════════ HOME ═══════════ */
+document.getElementById('home-products').innerHTML = PRODUCTS.slice(0,4).map(p=>productCardHTML(p)).join('');
+
+/* ═══════════ PRODUCTS PAGE ═══════════ */
+function renderFilters(){
+  const row = document.getElementById('filter-row');
+  row.innerHTML = CATS.map(c=>`<button class="filter-btn${c===activeCat?' active':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+}
+
+function setFilter(cat){ activeCat=cat; renderFilters(); renderProducts(); }
+
+function renderProducts(){
+  renderFilters();
+  const search = (document.getElementById('prod-search')||{}).value||'';
+  const filtered = PRODUCTS.filter(p=>(activeCat==='All'||p.cat===activeCat)&&p.name.toLowerCase().includes(search.toLowerCase()));
+  const grid = document.getElementById('all-products');
+  if(!filtered.length){ grid.innerHTML=`<div style="text-align:center;color:var(--muted);padding:3rem;grid-column:1/-1;">No products found.</div>`; return; }
+  grid.innerHTML = filtered.map(p=>productCardHTML(p)).join('');
+}
+
+/* ═══════════ CART PAGE ═══════════ */
+function renderCart(){
+  const wrap = document.getElementById('cart-content');
+  if(!cart.length){
+    wrap.innerHTML=`<div class="empty-state"><div class="empty-icon">🛒</div><h2 style="font-family:var(--cinzel);font-size:1.8rem;color:var(--text);margin-bottom:1rem;">Your cart is empty</h2><p class="muted" style="margin-bottom:2rem;">Add some divine fragrances!</p><button class="btn-primary" style="padding:.85rem 2rem;font-size:.95rem;" onclick="showPage('products')">Browse Products</button></div>`;
+    return;
+  }
+  const itemsHTML = cart.map(item=>`
+    <div class="cart-item">
+      <span style="font-size:1.8rem;">${item.icon}</span>
+      <div style="flex:1;"><div style="color:var(--text);font-size:.9rem;">${item.name}</div><div style="color:#a78bfa;font-size:.75rem;">₹${item.price} each</div></div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="updateQty(${item.id},-1)">−</button>
+        <span style="color:var(--text);min-width:1.2rem;text-align:center;font-size:.9rem;">${item.qty}</span>
+        <button class="qty-btn" onclick="updateQty(${item.id},1)">+</button>
+      </div>
+      <span style="font-family:var(--cinzel);color:var(--gold);min-width:3.5rem;text-align:right;font-size:.88rem;">₹${item.price*item.qty}</span>
+    </div>`).join('');
+
+  wrap.innerHTML=`
+    <div class="section-tag">CHECKOUT</div>
+    <h2 class="section-h2" style="margin-bottom:2rem;">Your <span class="gold">Order</span></h2>
+    <div class="order-grid">
+      <div class="card">
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:1rem;font-size:1rem;">Cart Items</div>
+        ${itemsHTML}
+        <div style="display:flex;justify-content:space-between;margin-top:1rem;padding-top:.75rem;border-top:1px solid rgba(234,179,8,.2);">
+          <span style="font-family:var(--cinzel);color:var(--text);">Total</span>
+          <span style="font-family:var(--cinzel);color:var(--gold);font-size:1.2rem;">${inr(cartTotal())}</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--cinzel);color:var(--gold);margin-bottom:1rem;font-size:1rem;">Delivery Details</div>
+        <div style="margin-bottom:.85rem;"><label class="input-label">Full Name</label><input id="ord-name" class="input-field input-npl" type="text"></div>
+        <div style="margin-bottom:.85rem;"><label class="input-label">Phone / WhatsApp</label><input id="ord-phone" class="input-field input-npl" type="tel"></div>
+        <div style="margin-bottom:.85rem;"><label class="input-label">Delivery Address</label><textarea id="ord-addr" class="input-field input-npl" rows="3" style="resize:vertical;"></textarea></div>
+        <div style="margin-bottom:1.25rem;">
+          <label class="input-label" style="margin-bottom:.5rem;">Payment Method</label>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;" id="pay-methods">
+            <button class="pay-btn active" onclick="setPay(this,'UPI')">UPI</button>
+            <button class="pay-btn" onclick="setPay(this,'Cash on Delivery')">Cash on Delivery</button>
+            <button class="pay-btn" onclick="setPay(this,'Card')">Card</button>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%;padding:.85rem;font-size:.95rem;" onclick="placeOrder()">Place Order — ${inr(cartTotal())}</button>
+        <p class="muted" style="font-size:.75rem;text-align:center;margin-top:.75rem;">Free delivery on orders above ₹299</p>
+      </div>
+    </div>`;
+}
+
+function setPay(btn, method){
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function updateQty(id, delta){
+  const item = cart.find(x=>x.id===id);
+  if(!item) return;
+  item.qty = Math.max(0, item.qty+delta);
+  cart = cart.filter(x=>x.qty>0);
+  updateCartBadge();
+  renderCart();
+}
+
+function placeOrder(){
+  const name = document.getElementById('ord-name')?.value;
+  const phone = document.getElementById('ord-phone')?.value;
+  const addr = document.getElementById('ord-addr')?.value;
+  if(!name||!phone||!addr){ alert('Please fill all fields!'); return; }
+  const total = cartTotal();
+  cart = [];
+  updateCartBadge();
+  document.getElementById('cart-content').innerHTML=`
+    <div class="empty-state">
+      <div class="success-icon">✅</div>
+      <h2 style="font-family:var(--cinzel);font-size:2rem;color:#4ade80;margin-bottom:1rem;">Order Placed!</h2>
+      <p class="muted" style="margin-bottom:1.5rem;">Thank you! Delivery in 2–3 business days.</p>
+      <div class="card" style="display:inline-block;padding:.75rem 2rem;margin-bottom:2rem;">
+        <span style="font-family:var(--cinzel);color:var(--gold);font-size:1.1rem;">Total Paid: ${inr(total)}</span>
+      </div><br>
+      <button class="btn-primary" style="padding:.85rem 2rem;font-size:.95rem;" onclick="showPage('home')">Continue Shopping</button>
+    </div>`;
+}
+
+/* ═══════════ DASHBOARD ═══════════ */
+function renderDashboard(){
+  const profit = totalEarn - totalExp;
+  const kpis=[
+    {label:"Annual Revenue",value:inr(totalEarn),icon:"📈",color:"#f59e0b",chg:"+18%"},
+    {label:"Total Expenses",value:inr(totalExp), icon:"📉",color:"#f97316",chg:"+12%"},
+    {label:"Net Profit",    value:inr(profit),   icon:"💰",color:"#4ade80",chg:"+24%"},
+    {label:"Total Orders",  value:"1,243",       icon:"📦",color:"#a78bfa",chg:"+31%"},
+  ];
+  document.getElementById('kpi-cards').innerHTML = kpis.map(k=>`
+    <div style="background:${k.color}11;border:1px solid ${k.color}33;border-radius:1rem;padding:1.25rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem;">${k.label}</div>
+          <div style="font-family:var(--cinzel);font-size:1.3rem;color:${k.color};font-weight:700;">${k.value}</div>
+        </div>
+        <span style="font-size:1.6rem;">${k.icon}</span>
+      </div>
+      <div style="margin-top:.65rem;color:#4ade80;font-size:.78rem;">↑ ${k.chg} vs last year</div>
+    </div>`).join('');
+
+  // Orders table
+  document.getElementById('orders-table').innerHTML=`
+    <thead><tr>${["Order ID","Customer","Items","Amount","Status","Date"].map(h=>`<th>${h.toUpperCase()}</th>`).join('')}</tr></thead>
+    <tbody>${ORDERS_DATA.map(o=>{
+      const sc=STATUS_COLORS[o.status]||{};
+      return `<tr>
+        <td style="font-family:var(--cinzel);color:var(--gold);font-size:.78rem;">${o.id}</td>
+        <td style="color:var(--text);">${o.customer}</td>
+        <td style="color:var(--muted);">${o.items}</td>
+        <td style="color:var(--text);">₹${o.amount}</td>
+        <td><span class="status-badge" style="background:${sc.bg};color:${sc.text};">${o.status}</span></td>
+        <td style="color:var(--muted);">${o.date}</td>
+      </tr>`;}).join('')}</tbody>`;
+
+  document.getElementById('dash-totals').innerHTML=[
+    ["Total Revenue",inr(totalEarn),"#f59e0b"],
+    ["Total Expenses",inr(totalExp),"#f97316"],
+    ["Net Profit",inr(totalEarn-totalExp),"#4ade80"]
+  ].map(([l,v,c])=>`<div><div style="font-size:.75rem;color:#a78bfa;margin-bottom:.2rem;">${l}</div><div style="font-family:var(--cinzel);color:${c};font-weight:700;font-size:1rem;">${v}</div></div>`).join('');
+
+  // Pie legend
+  document.getElementById('pie-legend').innerHTML=EXP_CATS.map(e=>`
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;">
+      <div class="legend-dot" style="background:${e.color};"></div>
+      <span class="muted" style="flex:1;">${e.name}</span>
+      <span style="color:var(--text);">${e.value}%</span>
+    </div>`).join('');
+
+  drawCharts();
+}
+
+function drawCharts(){
+  drawAreaChart();
+  drawPieChart();
+  drawBarChart();
+}
+
+function drawAreaChart(){
+  const canvas = document.getElementById('area-chart');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 400;
+  canvas.width = W; canvas.height = 200;
+  const pad={top:10,right:10,bottom:30,left:46};
+  const cw=W-pad.left-pad.right, ch=200-pad.top-pad.bottom;
+  const maxV = Math.max(...MONTHLY.map(m=>m.earn));
+  const x = i => pad.left + (i/(MONTHLY.length-1))*cw;
+  const y = v => pad.top + ch - (v/maxV)*ch;
+
+  ctx.clearRect(0,0,W,200);
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const yy=pad.top+(i/4)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.left,yy); ctx.lineTo(pad.left+cw,yy); ctx.stroke();
+  }
+
+  // Area fill earn
+  const gE=ctx.createLinearGradient(0,pad.top,0,pad.top+ch);
+  gE.addColorStop(0,'rgba(245,158,11,0.35)'); gE.addColorStop(1,'rgba(245,158,11,0)');
+  ctx.beginPath(); ctx.moveTo(x(0),y(MONTHLY[0].earn));
+  MONTHLY.forEach((m,i)=>ctx.lineTo(x(i),y(m.earn)));
+  ctx.lineTo(x(MONTHLY.length-1),pad.top+ch); ctx.lineTo(x(0),pad.top+ch);
+  ctx.closePath(); ctx.fillStyle=gE; ctx.fill();
+
+  // Area fill exp
+  const gX=ctx.createLinearGradient(0,pad.top,0,pad.top+ch);
+  gX.addColorStop(0,'rgba(249,115,22,0.35)'); gX.addColorStop(1,'rgba(249,115,22,0)');
+  ctx.beginPath(); ctx.moveTo(x(0),y(MONTHLY[0].exp));
+  MONTHLY.forEach((m,i)=>ctx.lineTo(x(i),y(m.exp)));
+  ctx.lineTo(x(MONTHLY.length-1),pad.top+ch); ctx.lineTo(x(0),pad.top+ch);
+  ctx.closePath(); ctx.fillStyle=gX; ctx.fill();
+
+  // Lines
+  [['earn','#f59e0b'],['exp','#f97316']].forEach(([k,c])=>{
+    ctx.beginPath(); ctx.strokeStyle=c; ctx.lineWidth=2;
+    MONTHLY.forEach((m,i)=>i===0?ctx.moveTo(x(i),y(m[k])):ctx.lineTo(x(i),y(m[k])));
+    ctx.stroke();
+  });
+
+  // X axis labels
+  ctx.fillStyle='#c4b5fd'; ctx.font='11px Cormorant Garamond,serif'; ctx.textAlign='center';
+  MONTHLY.forEach((m,i)=>ctx.fillText(m.m,x(i),200-8));
+
+  // Y axis labels
+  ctx.textAlign='right';
+  for(let i=0;i<=4;i++){
+    const v=(maxV*(4-i)/4);
+    ctx.fillText('₹'+(v/1000).toFixed(0)+'k',pad.left-4,pad.top+(i/4)*ch+4);
+  }
+}
+
+function drawPieChart(){
+  const canvas=document.getElementById('pie-chart');
+  if(!canvas) return;
+  const W=canvas.offsetWidth||300;
+  canvas.width=W; canvas.height=160;
+  const ctx=canvas.getContext('2d');
+  const cx=W/2, cy=75, r=60, inner=30;
+  let angle=-Math.PI/2;
+  ctx.clearRect(0,0,W,160);
+  EXP_CATS.forEach(e=>{
+    const slice=(e.value/100)*2*Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+slice);
+    ctx.closePath();
+    ctx.fillStyle=e.color; ctx.fill();
+    ctx.strokeStyle='#0f0520'; ctx.lineWidth=2; ctx.stroke();
+    angle+=slice;
+  });
+  // Donut hole
+  ctx.beginPath(); ctx.arc(cx,cy,inner,0,2*Math.PI);
+  ctx.fillStyle='#0f0520'; ctx.fill();
+}
+
+function drawBarChart(){
+  const canvas=document.getElementById('bar-chart');
+  if(!canvas) return;
+  const W=canvas.offsetWidth||600;
+  canvas.width=W; canvas.height=180;
+  const ctx=canvas.getContext('2d');
+  const pad={top:10,right:10,bottom:30,left:46};
+  const profits=MONTHLY.map(m=>m.earn-m.exp);
+  const maxP=Math.max(...profits);
+  const cw=W-pad.left-pad.right, ch=180-pad.top-pad.bottom;
+  const bw=Math.min(40,(cw/MONTHLY.length)*0.6);
+  ctx.clearRect(0,0,W,180);
+
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const yy=pad.top+(i/4)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.left,yy); ctx.lineTo(pad.left+cw,yy); ctx.stroke();
+  }
+
+  const gBar=ctx.createLinearGradient(0,pad.top,0,pad.top+ch);
+  gBar.addColorStop(0,'#f59e0b'); gBar.addColorStop(1,'#f97316');
+
+  MONTHLY.forEach((m,i)=>{
+    const p=profits[i];
+    const bx=pad.left+(i/(MONTHLY.length))*cw+(cw/MONTHLY.length-bw)/2;
+    const bh=(p/maxP)*ch;
+    const by=pad.top+ch-bh;
+    const rad=4;
+    ctx.beginPath();
+    ctx.moveTo(bx+rad,by); ctx.lineTo(bx+bw-rad,by);
+    ctx.quadraticCurveTo(bx+bw,by,bx+bw,by+rad);
+    ctx.lineTo(bx+bw,by+bh); ctx.lineTo(bx,by+bh);
+    ctx.lineTo(bx,by+rad); ctx.quadraticCurveTo(bx,by,bx+rad,by);
+    ctx.closePath(); ctx.fillStyle=gBar; ctx.fill();
+  });
+
+  // Labels
+  ctx.fillStyle='#c4b5fd'; ctx.font='11px Cormorant Garamond,serif'; ctx.textAlign='center';
+  MONTHLY.forEach((m,i)=>{
+    const bx=pad.left+(i/MONTHLY.length)*cw+(cw/MONTHLY.length)/2;
+    ctx.fillText(m.m,bx,180-8);
+  });
+  ctx.textAlign='right';
+  for(let i=0;i<=4;i++){
+    const v=(maxP*(4-i)/4);
+    ctx.fillText('₹'+(v/1000).toFixed(0)+'k',pad.left-4,pad.top+(i/4)*ch+4);
+  }
+}
+
+/* ═══════════ CONTACT ═══════════ */
+function renderContact(){
+  document.getElementById('reviews-list').innerHTML=REVIEWS.map(r=>`
+    <div class="card">
+      <div>${stars(r.rating)}</div>
+      <p style="color:#e9d5ff;font-size:.86rem;line-height:1.75;font-style:italic;margin:.5rem 0;">"${r.text}"</p>
+      <div style="font-family:var(--cinzel);color:var(--gold);font-size:.8rem;">${r.name}</div>
+      <div style="color:#a78bfa;font-size:.75rem;">${r.loc}</div>
+    </div>`).join('');
+}
+
+function sendContact(){
+  document.getElementById('contact-form-wrap').innerHTML=`
+    <div style="text-align:center;padding:1.5rem 0;">
+      <div style="font-size:2.5rem;margin-bottom:.75rem;">✅</div>
+      <div style="font-family:var(--cinzel);color:#4ade80;margin-bottom:.4rem;">Message Sent!</div>
+      <div class="muted" style="font-size:.83rem;">We'll reply within 24 hours.</div>
+    </div>`;
+}
+
+/* ═══════════ INIT ═══════════ */
+renderContact();
+
+// Redraw charts on resize
+window.addEventListener('resize', ()=>{
+  if(currentPage==='dashboard') drawCharts();
+});
+</script>
+</body>
+</html>
